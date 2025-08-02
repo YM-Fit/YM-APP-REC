@@ -1,10 +1,4 @@
-// Main application component for the React version of the studio app.
-// אפליקציית מעקב אימונים אישיים - סטודיו YM
-// האפליקציה מאפשרת למתאמנים לראות את תוכניות האימון שהמאמן בנה להם,
-// לבנות תוכניות בעצמם, לעקוב אחרי אימונים ולראות מדדי התקדמות.
-// הנתונים נשמרים ב-localStorage לעבודה אופליין.
-
-import React, { useState, useEffect } from 'https://cdn.skypack.dev/react@18.2.0';
+import React, { useState, useEffect } from 'react';
 
 // Helper: generate a random ID for new records
 const generateId = () => '_' + Math.random().toString(36).substr(2, 9);
