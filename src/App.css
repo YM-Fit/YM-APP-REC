@@ -1,0 +1,320 @@
+/*
+ * Global stylesheet for the React studio app.  We follow UI/UX best practices
+ * by maintaining a clean, consistent layout with ample spacing and clear
+ * typography.  The layout supports right-to-left reading and uses a
+ * harmonious color palette to provide a pleasant user experience【60002966627165†L436-L449】.
+ */
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: #f7f7f7;
+  color: #333;
+  direction: rtl;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.navbar {
+  background-color: #2c3e50;
+  color: #ecf0f1;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.navbar-brand {
+  font-weight: bold;
+}
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 15px;
+  padding: 0;
+  margin: 0;
+}
+.nav-links li {
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 4px;
+}
+.nav-links li:hover {
+  background-color: #34495e;
+}
+.nav-links li.active {
+  background-color: #1abc9c;
+  color: #fff;
+}
+.nav-links li:last-child {
+  background-color: #e74c3c;
+  color: #fff;
+}
+.page-container {
+  flex: 1;
+  padding: 20px;
+}
+
+/* Auth page */
+.auth-container {
+  max-width: 400px;
+  margin: 50px auto;
+  padding: 20px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.auth-form input, .auth-form select {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100%;
+  box-sizing: border-box;
+}
+.auth-form button {
+  padding: 10px;
+  background-color: #1abc9c;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.auth-form button:hover {
+  background-color: #16a085;
+}
+.toggle-link {
+  margin-top: 10px;
+  color: #2980b9;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.toggle-link:hover {
+  color: #1f618d;
+}
+.message {
+  margin-top: 10px;
+  color: #27ae60;
+  font-weight: bold;
+}
+
+/* Dashboard */
+.dashboard .metric-summary, .dashboard .program-summary {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  padding: 15px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+.dashboard ul {
+  list-style: none;
+  padding: 0;
+}
+.dashboard li {
+  margin-bottom: 5px;
+}
+
+/* Programs page */
+.programs-page form {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  padding: 15px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  max-width: 500px;
+}
+.programs-page label {
+  display: block;
+  margin-bottom: 8px;
+}
+.programs-page input[type="text"], .programs-page textarea, .programs-page select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+.programs-page button {
+  background-color: #1abc9c;
+  color: #fff;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.programs-page button:hover {
+  background-color: #16a085;
+}
+.programs-list ul {
+  list-style: none;
+  padding: 0;
+}
+.programs-list li {
+  padding: 8px;
+  margin-bottom: 5px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+/* Metrics page */
+.metric-form {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  padding: 15px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  max-width: 500px;
+}
+.metric-form label {
+  display: block;
+  margin-bottom: 8px;
+}
+.metric-form input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+.metric-form button {
+  background-color: #1abc9c;
+  color: #fff;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.metric-form button:hover {
+  background-color: #16a085;
+}
+.metrics-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.metrics-table th, .metrics-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+.metrics-table th {
+  background-color: #ecf0f1;
+}
+
+/* Schedule, Groups and Store pages */
+.session-form, .group-form, .product-form {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  padding: 15px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  max-width: 500px;
+}
+.session-form label, .group-form label, .product-form label {
+  display: block;
+  margin-bottom: 8px;
+}
+.session-form input, .session-form textarea,
+.group-form input, .group-form textarea,
+.product-form input, .product-form textarea {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+.session-form button, .group-form button, .product-form button {
+  background-color: #1abc9c;
+  color: #fff;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.session-form button:hover, .group-form button:hover, .product-form button:hover {
+  background-color: #16a085;
+}
+.sessions-list, .groups-list, .products-list {
+  list-style: none;
+  padding: 0;
+}
+.session-item, .group-item, .product-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 10px;
+  margin-bottom: 6px;
+}
+.session-item button, .group-item button, .product-item button {
+  background-color: #3498db;
+  color: #fff;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.session-item button:disabled, .group-item button:disabled, .product-item button:disabled {
+  background-color: #95a5a6;
+  cursor: not-allowed;
+}
+.session-item button:hover:not(:disabled), .group-item button:hover:not(:disabled), .product-item button:hover:not(:disabled) {
+  background-color: #2980b9;
+}
+
+/* Profile page */
+.profile-form {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  padding: 15px;
+  border-radius: 6px;
+  max-width: 500px;
+}
+.profile-form label {
+  display: block;
+  margin-bottom: 8px;
+}
+.profile-form input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+.profile-form fieldset {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  padding: 10px;
+}
+.profile-form legend {
+  font-weight: bold;
+}
+.profile-form button {
+  background-color: #1abc9c;
+  color: #fff;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.profile-form button:hover {
+  background-color: #16a085;
+}
+
+/* Loading state */
+.loading {
+  text-align: center;
+  margin-top: 50px;
+  font-size: 1.2em;
+}
