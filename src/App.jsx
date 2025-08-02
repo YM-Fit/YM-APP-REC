@@ -1,10 +1,8 @@
 // Main application component for the React version of the studio app.
-// This file defines the core state, authentication, routing and page components.
-// We aim to provide a cleaner, more intuitive user experience as recommended by
-// professional guidelines for fitness apps: keep the interface consistent,
-// intuitive and aligned with brand identity【60002966627165†L436-L449】.  The app
-// stores its data (users, programs, sessions, groups, products) in
-// localStorage so it works offline, similar to the original vanilla JS app.
+// אפליקציית מעקב אימונים אישיים - סטודיו YM
+// האפליקציה מאפשרת למתאמנים לראות את תוכניות האימון שהמאמן בנה להם,
+// לבנות תוכניות בעצמם, לעקוב אחרי אימונים ולראות מדדי התקדמות.
+// הנתונים נשמרים ב-localStorage לעבודה אופליין.
 
 import React, { useState, useEffect } from 'https://cdn.skypack.dev/react@18.2.0';
 
@@ -23,9 +21,8 @@ async function hashPassword(password) {
 // Keys used in localStorage
 const USERS_KEY = 'studio_users';
 const PROGRAMS_KEY = 'studio_programs';
-const SESSIONS_KEY = 'studio_sessions';
-const GROUPS_KEY = 'studio_groups';
-const PRODUCTS_KEY = 'studio_products';
+const WORKOUTS_KEY = 'studio_workouts';
+const EXERCISES_KEY = 'studio_exercises';
 
 // Load data from localStorage or initialize defaults
 function loadData() {
@@ -53,9 +50,7 @@ function loadData() {
         goals: {},
         waterGoal: 2,
         assignedProgramId: null,
-        joinedSessions: [],
-        joinedGroups: [],
-        purchasedProducts: [],
+        completedWorkouts: [],
         metrics: []
       },
       {
@@ -69,9 +64,7 @@ function loadData() {
         goals: {},
         waterGoal: 2,
         assignedProgramId: null,
-        joinedSessions: [],
-        joinedGroups: [],
-        purchasedProducts: [],
+        completedWorkouts: [],
         metrics: []
       }
     ];
@@ -91,39 +84,68 @@ function loadData() {
       id: generateId(),
       name: 'תוכנית בסיסית',
       description: 'תוכנית כללית לשיפור הכושר',
+      difficulty: 'בינוני',
+      duration: '45 דקות',
+      targetMuscles: ['רגליים', 'חזה', 'גב'],
       exercises: [
-        { name: 'סקוואט', sets: 3, reps: 12, rest: '60', notes: 'שמור על גב ישר', video: '' },
-        { name: 'לחיצת חזה', sets: 3, reps: 10, rest: '60', notes: '', video: '' }
+        { 
+          id: generateId(),
+          name: 'סקוואט', 
+          sets: 3, 
+          reps: 12, 
+          weight: 0,
+          rest: 60, 
+          notes: 'שמור על גב ישר', 
+          muscleGroup: 'רגליים',
+          video: '',
+          completed: false
+        },
+        { 
+          id: generateId(),
+          name: 'לחיצת חזה', 
+          sets: 3, 
+          reps: 10, 
+          weight: 0,
+          rest: 60, 
+          notes: 'נשימה נכונה', 
+          muscleGroup: 'חזה',
+          video: '',
+          completed: false
+        }
       ]
     });
     localStorage.setItem(PROGRAMS_KEY, JSON.stringify(programs));
   }
 
-  // Sessions
-  let sessions = [];
+  // Workouts (completed workout sessions)
+  let workouts = [];
   try {
-    sessions = JSON.parse(localStorage.getItem(SESSIONS_KEY) || '[]');
+    workouts = JSON.parse(localStorage.getItem(WORKOUTS_KEY) || '[]');
   } catch (e) {
-    sessions = [];
+    workouts = [];
   }
 
-  // Groups
-  let groups = [];
+  // Exercise library
+  let exercises = [];
   try {
-    groups = JSON.parse(localStorage.getItem(GROUPS_KEY) || '[]');
+    exercises = JSON.parse(localStorage.getItem(EXERCISES_KEY) || '[]');
   } catch (e) {
-    groups = [];
+    exercises = [];
+  }
+  if (exercises.length === 0) {
+    // Default exercise library
+    exercises = [
+      { id: generateId(), name: 'סקוואט', muscleGroup: 'רגליים', equipment: 'משקל גוף' },
+      { id: generateId(), name: 'לחיצת חזה', muscleGroup: 'חזה', equipment: 'משקולות' },
+      { id: generateId(), name: 'משיכת גב', muscleGroup: 'גב', equipment: 'כבל' },
+      { id: generateId(), name: 'לחיצת כתפיים', muscleGroup: 'כתפיים', equipment: 'משקולות' },
+      { id: generateId(), name: 'סיבובי בטן', muscleGroup: 'בטן', equipment: 'משקל גוף' },
+      { id: generateId(), name: 'דדליפט', muscleGroup: 'רגליים', equipment: 'משקולות' }
+    ];
+    localStorage.setItem(EXERCISES_KEY, JSON.stringify(exercises));
   }
 
-  // Products
-  let products = [];
-  try {
-    products = JSON.parse(localStorage.getItem(PRODUCTS_KEY) || '[]');
-  } catch (e) {
-    products = [];
-  }
-
-  return { users, programs, sessions, groups, products };
+  return { users, programs, workouts, exercises };
 }
 
 // Save functions to persist to localStorage
@@ -135,37 +157,31 @@ function savePrograms(programs) {
   localStorage.setItem(PROGRAMS_KEY, JSON.stringify(programs));
 }
 
-function saveSessions(sessions) {
-  localStorage.setItem(SESSIONS_KEY, JSON.stringify(sessions));
+function saveWorkouts(workouts) {
+  localStorage.setItem(WORKOUTS_KEY, JSON.stringify(workouts));
 }
 
-function saveGroups(groups) {
-  localStorage.setItem(GROUPS_KEY, JSON.stringify(groups));
-}
-
-function saveProducts(products) {
-  localStorage.setItem(PRODUCTS_KEY, JSON.stringify(products));
+function saveExercises(exercises) {
+  localStorage.setItem(EXERCISES_KEY, JSON.stringify(exercises));
 }
 
 export default function App() {
   // Global state
   const [users, setUsers] = useState([]);
   const [programs, setPrograms] = useState([]);
-  const [sessions, setSessions] = useState([]);
-  const [groups, setGroups] = useState([]);
-  const [products, setProducts] = useState([]);
+  const [workouts, setWorkouts] = useState([]);
+  const [exercises, setExercises] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
   const [activePage, setActivePage] = useState('dashboard');
   const [loading, setLoading] = useState(true);
 
   // Initialize data on mount
   useEffect(() => {
-    const { users: u, programs: p, sessions: s, groups: g, products: pr } = loadData();
+    const { users: u, programs: p, workouts: w, exercises: e } = loadData();
     setUsers(u);
     setPrograms(p);
-    setSessions(s);
-    setGroups(g);
-    setProducts(pr);
+    setWorkouts(w);
+    setExercises(e);
     setLoading(false);
   }, []);
 
@@ -182,19 +198,14 @@ export default function App() {
   }, [programs, loading]);
   useEffect(() => {
     if (!loading) {
-      saveSessions(sessions);
+      saveWorkouts(workouts);
     }
-  }, [sessions, loading]);
+  }, [workouts, loading]);
   useEffect(() => {
     if (!loading) {
-      saveGroups(groups);
+      saveExercises(exercises);
     }
-  }, [groups, loading]);
-  useEffect(() => {
-    if (!loading) {
-      saveProducts(products);
-    }
-  }, [products, loading]);
+  }, [exercises, loading]);
 
   // Authentication handlers
   const handleLogin = async (username, password) => {
@@ -236,9 +247,7 @@ export default function App() {
       goals: {},
       waterGoal: 2,
       assignedProgramId: null,
-      joinedSessions: [],
-      joinedGroups: [],
-      purchasedProducts: [],
+      completedWorkouts: [],
       metrics: []
     };
     setUsers([...users, newUser]);
@@ -252,8 +261,20 @@ export default function App() {
 
   // CRUD operations for programs
   const addProgram = (name, description) => {
-    const newProgram = { id: generateId(), name, description, exercises: [] };
+    const newProgram = { 
+      id: generateId(), 
+      name, 
+      description, 
+      difficulty: 'בינוני',
+      duration: '45 דקות',
+      targetMuscles: [],
+      exercises: [] 
+    };
     setPrograms([...programs, newProgram]);
+  };
+
+  const updateProgram = (programId, updatedProgram) => {
+    setPrograms(programs.map(p => p.id === programId ? updatedProgram : p));
   };
 
   const assignProgramToUser = (username, programId) => {
@@ -267,82 +288,32 @@ export default function App() {
     );
   };
 
-  // Session operations
-  const createSession = (title, date, time, capacity, description) => {
-    const newSession = {
+  // Workout operations
+  const completeWorkout = (programId, exerciseResults, notes) => {
+    const workout = {
       id: generateId(),
-      title,
-      date,
-      time,
-      capacity: parseInt(capacity, 10),
-      description,
-      participants: []
+      userId: currentUser.id,
+      programId,
+      date: new Date().toISOString(),
+      exercises: exerciseResults,
+      notes,
+      duration: 0 // will be calculated
     };
-    setSessions([...sessions, newSession]);
-  };
-  const bookSession = (sessionId) => {
-    if (!currentUser) return;
-    setSessions(
-      sessions.map((s) => {
-        if (s.id === sessionId) {
-          if (s.participants.includes(currentUser.id)) return s;
-          if (s.participants.length >= s.capacity) return s;
-          return { ...s, participants: [...s.participants, currentUser.id] };
-        }
-        return s;
-      })
-    );
+    setWorkouts([...workouts, workout]);
     setUsers(
-      users.map((u) => (u.id === currentUser.id ? { ...u, joinedSessions: [...u.joinedSessions, sessionId] } : u))
+      users.map((u) => (u.id === currentUser.id ? { ...u, completedWorkouts: [...u.completedWorkouts, workout.id] } : u))
     );
   };
 
-  // Group operations
-  const createGroup = (title, date, time, capacity, description) => {
-    const newGroup = {
-      id: generateId(),
-      title,
-      date,
-      time,
-      capacity: parseInt(capacity, 10),
-      description,
-      members: []
-    };
-    setGroups([...groups, newGroup]);
-  };
-  const joinGroup = (groupId) => {
-    if (!currentUser) return;
-    setGroups(
-      groups.map((g) => {
-        if (g.id === groupId) {
-          if (g.members.includes(currentUser.id) || g.members.length >= g.capacity) return g;
-          return { ...g, members: [...g.members, currentUser.id] };
-        }
-        return g;
-      })
-    );
-    setUsers(
-      users.map((u) => (u.id === currentUser.id ? { ...u, joinedGroups: [...u.joinedGroups, groupId] } : u))
-    );
-  };
-
-  // Product operations
-  const createProduct = (name, price, description) => {
-    const newProduct = {
+  // Exercise library operations
+  const addExercise = (name, muscleGroup, equipment) => {
+    const newExercise = {
       id: generateId(),
       name,
-      price: parseFloat(price),
-      description
+      muscleGroup,
+      equipment
     };
-    setProducts([...products, newProduct]);
-  };
-  const purchaseProduct = (productId) => {
-    if (!currentUser) return;
-    const user = users.find((u) => u.id === currentUser.id);
-    if (user.purchasedProducts.includes(productId)) return;
-    setUsers(
-      users.map((u) => (u.id === currentUser.id ? { ...u, purchasedProducts: [...u.purchasedProducts, productId] } : u))
-    );
+    setExercises([...exercises, newExercise]);
   };
 
   // Profile update
@@ -373,13 +344,16 @@ export default function App() {
               <Dashboard
                 user={currentUser}
                 programs={programs}
+                workouts={workouts}
               />
             )}
             {activePage === 'programs' && (
               <ProgramsPage
                 user={currentUser}
                 programs={programs}
+                exercises={exercises}
                 addProgram={addProgram}
+                updateProgram={updateProgram}
                 assignProgram={assignProgramToUser}
                 users={users}
               />
@@ -387,28 +361,19 @@ export default function App() {
             {activePage === 'metrics' && (
               <MetricsPage user={currentUser} addMetric={addMetric} />
             )}
-            {activePage === 'schedule' && (
-              <SchedulePage
+            {activePage === 'workouts' && (
+              <WorkoutsPage
                 user={currentUser}
-                sessions={sessions}
-                createSession={createSession}
-                bookSession={bookSession}
+                programs={programs}
+                workouts={workouts}
+                completeWorkout={completeWorkout}
               />
             )}
-            {activePage === 'groups' && (
-              <GroupsPage
+            {activePage === 'exercises' && (
+              <ExercisesPage
                 user={currentUser}
-                groups={groups}
-                createGroup={createGroup}
-                joinGroup={joinGroup}
-              />
-            )}
-            {activePage === 'store' && (
-              <StorePage
-                user={currentUser}
-                products={products}
-                createProduct={createProduct}
-                purchaseProduct={purchaseProduct}
+                exercises={exercises}
+                addExercise={addExercise}
               />
             )}
             {activePage === 'profile' && (
@@ -427,7 +392,7 @@ export default function App() {
 function Navbar({ currentUser, activePage, setActivePage, logout }) {
   return (
     <nav className="navbar">
-      <div className="navbar-brand">ברוך הבא, {currentUser.fullName || currentUser.username}</div>
+      <div className="navbar-brand">סטודיו YM - ברוך הבא, {currentUser.fullName || currentUser.username}</div>
       <ul className="nav-links">
         <li onClick={() => setActivePage('dashboard')} className={activePage === 'dashboard' ? 'active' : ''}>
           דשבורד
@@ -438,14 +403,11 @@ function Navbar({ currentUser, activePage, setActivePage, logout }) {
         <li onClick={() => setActivePage('metrics')} className={activePage === 'metrics' ? 'active' : ''}>
           מדדים
         </li>
-        <li onClick={() => setActivePage('schedule')} className={activePage === 'schedule' ? 'active' : ''}>
-          שיעורים
+        <li onClick={() => setActivePage('workouts')} className={activePage === 'workouts' ? 'active' : ''}>
+          אימונים
         </li>
-        <li onClick={() => setActivePage('groups')} className={activePage === 'groups' ? 'active' : ''}>
-          קבוצות
-        </li>
-        <li onClick={() => setActivePage('store')} className={activePage === 'store' ? 'active' : ''}>
-          חנות
+        <li onClick={() => setActivePage('exercises')} className={activePage === 'exercises' ? 'active' : ''}>
+          ספריית תרגילים
         </li>
         <li onClick={() => setActivePage('profile')} className={activePage === 'profile' ? 'active' : ''}>
           פרופיל
@@ -512,15 +474,30 @@ function AuthPage({ onLogin, onRegister }) {
 }
 
 // Dashboard page: shows summary of user's metrics and assigned program
-function Dashboard({ user, programs }) {
+function Dashboard({ user, programs, workouts }) {
   const assignedProgram = programs.find((p) => p.id === user.assignedProgramId);
   const lastMetric = user.metrics.length ? user.metrics[user.metrics.length - 1] : null;
+  const userWorkouts = workouts.filter(w => w.userId === user.id);
+  const thisWeekWorkouts = userWorkouts.filter(w => {
+    const workoutDate = new Date(w.date);
+    const weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
+    return workoutDate >= weekAgo;
+  });
+
   return (
     <div className="dashboard">
-      <h2>דשבורד</h2>
+      <h2>דשבורד - סטודיו YM</h2>
+      
+      <div className="workout-summary">
+        <h3>סיכום אימונים</h3>
+        <p>אימונים השבוע: {thisWeekWorkouts.length}</p>
+        <p>סה"כ אימונים: {userWorkouts.length}</p>
+      </div>
+
       {lastMetric ? (
         <div className="metric-summary">
-          <p>נתוני המדידה האחרונה:</p>
+          <h3>נתוני המדידה האחרונה:</h3>
           <ul>
             <li>משקל: {lastMetric.weight}</li>
             <li>אחוז שומן: {lastMetric.bodyFat}</li>
@@ -532,11 +509,14 @@ function Dashboard({ user, programs }) {
       ) : (
         <p>אין מדידות עדיין.</p>
       )}
+
       {assignedProgram ? (
         <div className="program-summary">
-          <p>התוכנית הנוכחית שלך:</p>
+          <h3>התוכנית הנוכחית שלך:</h3>
           <h4>{assignedProgram.name}</h4>
           <p>{assignedProgram.description}</p>
+          <p>רמת קושי: {assignedProgram.difficulty}</p>
+          <p>משך זמן: {assignedProgram.duration}</p>
         </div>
       ) : (
         <p>לא הוקצתה לך תוכנית.</p>
@@ -546,11 +526,14 @@ function Dashboard({ user, programs }) {
 }
 
 // Programs page: trainers can create and assign programs; clients view their program
-function ProgramsPage({ user, programs, addProgram, assignProgram, users }) {
+function ProgramsPage({ user, programs, exercises, addProgram, updateProgram, assignProgram, users }) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
+  const [difficulty, setDifficulty] = useState('בינוני');
+  const [duration, setDuration] = useState('');
   const [selectedUser, setSelectedUser] = useState('');
   const [selectedProgram, setSelectedProgram] = useState('');
+  const [editingProgram, setEditingProgram] = useState(null);
   const [message, setMessage] = useState('');
 
   const handleCreate = (e) => {
@@ -571,6 +554,30 @@ function ProgramsPage({ user, programs, addProgram, assignProgram, users }) {
     setMessage('התוכנית הוקצתה בהצלחה');
   };
 
+  const addExerciseToProgram = (programId, exerciseId) => {
+    const exercise = exercises.find(e => e.id === exerciseId);
+    if (!exercise) return;
+    
+    const program = programs.find(p => p.id === programId);
+    const newExercise = {
+      id: generateId(),
+      name: exercise.name,
+      sets: 3,
+      reps: 10,
+      weight: 0,
+      rest: 60,
+      notes: '',
+      muscleGroup: exercise.muscleGroup,
+      completed: false
+    };
+    
+    const updatedProgram = {
+      ...program,
+      exercises: [...program.exercises, newExercise]
+    };
+    updateProgram(programId, updatedProgram);
+  };
+
   if (user.role === 'trainer') {
     return (
       <div className="programs-page">
@@ -584,6 +591,14 @@ function ProgramsPage({ user, programs, addProgram, assignProgram, users }) {
           <label>
             תיאור:
             <textarea value={description} onChange={(e) => setDescription(e.target.value)} />
+          </label>
+          <label>
+            רמת קושי:
+            <select value={difficulty} onChange={(e) => setDifficulty(e.target.value)}>
+              <option value="קל">קל</option>
+              <option value="בינוני">בינוני</option>
+              <option value="קשה">קשה</option>
+            </select>
           </label>
           <button type="submit">שמור</button>
         </form>
@@ -614,10 +629,29 @@ function ProgramsPage({ user, programs, addProgram, assignProgram, users }) {
           <h3>כל התוכניות</h3>
           <ul>
             {programs.map((p) => (
-              <li key={p.id}><strong>{p.name}</strong> – {p.description}</li>
+              <li key={p.id}>
+                <div>
+                  <strong>{p.name}</strong> – {p.description}
+                  <br />
+                  רמת קושי: {p.difficulty} | משך זמן: {p.duration}
+                  <br />
+                  תרגילים: {p.exercises.length}
+                </div>
+                <button onClick={() => setEditingProgram(p)}>ערוך תוכנית</button>
+              </li>
             ))}
           </ul>
         </div>
+        
+        {editingProgram && (
+          <ProgramEditor 
+            program={editingProgram}
+            exercises={exercises}
+            updateProgram={updateProgram}
+            addExerciseToProgram={addExerciseToProgram}
+            onClose={() => setEditingProgram(null)}
+          />
+        )}
       </div>
     );
   } else {
@@ -630,10 +664,19 @@ function ProgramsPage({ user, programs, addProgram, assignProgram, users }) {
           <div className="program-details">
             <h3>{myProgram.name}</h3>
             <p>{myProgram.description}</p>
+            <p>רמת קושי: {myProgram.difficulty}</p>
+            <p>משך זמן: {myProgram.duration}</p>
             <h4>תרגילים:</h4>
             <ul>
               {myProgram.exercises.map((ex, idx) => (
-                <li key={idx}>{ex.name} - {ex.sets} סטים × {ex.reps} חזרות (מנוחה: {ex.rest} שניות)</li>
+                <li key={idx}>
+                  <strong>{ex.name}</strong> - {ex.sets} סטים × {ex.reps} חזרות
+                  {ex.weight > 0 && ` - ${ex.weight} ק"ג`}
+                  <br />
+                  מנוחה: {ex.rest} שניות | קבוצת שרירים: {ex.muscleGroup}
+                  {ex.notes && <br />}
+                  {ex.notes && <em>הערות: {ex.notes}</em>}
+                </li>
               ))}
             </ul>
           </div>
@@ -643,6 +686,111 @@ function ProgramsPage({ user, programs, addProgram, assignProgram, users }) {
       </div>
     );
   }
+}
+
+// Program Editor Component
+function ProgramEditor({ program, exercises, updateProgram, addExerciseToProgram, onClose }) {
+  const [selectedExercise, setSelectedExercise] = useState('');
+  
+  const removeExerciseFromProgram = (exerciseId) => {
+    const updatedProgram = {
+      ...program,
+      exercises: program.exercises.filter(e => e.id !== exerciseId)
+    };
+    updateProgram(program.id, updatedProgram);
+  };
+  
+  const updateExerciseInProgram = (exerciseId, field, value) => {
+    const updatedProgram = {
+      ...program,
+      exercises: program.exercises.map(e => 
+        e.id === exerciseId ? { ...e, [field]: value } : e
+      )
+    };
+    updateProgram(program.id, updatedProgram);
+  };
+
+  return (
+    <div className="program-editor">
+      <h3>עריכת תוכנית: {program.name}</h3>
+      
+      <div className="add-exercise">
+        <h4>הוסף תרגיל</h4>
+        <select 
+          value={selectedExercise} 
+          onChange={(e) => setSelectedExercise(e.target.value)}
+        >
+          <option value="">בחר תרגיל</option>
+          {exercises.map(ex => (
+            <option key={ex.id} value={ex.id}>{ex.name} ({ex.muscleGroup})</option>
+          ))}
+        </select>
+        <button 
+          onClick={() => {
+            if (selectedExercise) {
+              addExerciseToProgram(program.id, selectedExercise);
+              setSelectedExercise('');
+            }
+          }}
+        >
+          הוסף תרגיל
+        </button>
+      </div>
+      
+      <div className="exercises-list">
+        <h4>תרגילים בתוכנית</h4>
+        {program.exercises.map(ex => (
+          <div key={ex.id} className="exercise-editor">
+            <h5>{ex.name}</h5>
+            <div className="exercise-params">
+              <label>
+                סטים:
+                <input 
+                  type="number" 
+                  value={ex.sets} 
+                  onChange={(e) => updateExerciseInProgram(ex.id, 'sets', parseInt(e.target.value))}
+                />
+              </label>
+              <label>
+                חזרות:
+                <input 
+                  type="number" 
+                  value={ex.reps} 
+                  onChange={(e) => updateExerciseInProgram(ex.id, 'reps', parseInt(e.target.value))}
+                />
+              </label>
+              <label>
+                משקל (ק"ג):
+                <input 
+                  type="number" 
+                  value={ex.weight} 
+                  onChange={(e) => updateExerciseInProgram(ex.id, 'weight', parseFloat(e.target.value))}
+                />
+              </label>
+              <label>
+                מנוחה (שניות):
+                <input 
+                  type="number" 
+                  value={ex.rest} 
+                  onChange={(e) => updateExerciseInProgram(ex.id, 'rest', parseInt(e.target.value))}
+                />
+              </label>
+            </div>
+            <label>
+              הערות:
+              <textarea 
+                value={ex.notes} 
+                onChange={(e) => updateExerciseInProgram(ex.id, 'notes', e.target.value)}
+              />
+            </label>
+            <button onClick={() => removeExerciseFromProgram(ex.id)}>הסר תרגיל</button>
+          </div>
+        ))}
+      </div>
+      
+      <button onClick={onClose}>סגור עורך</button>
+    </div>
+  );
 }
 
 // Metrics page: form to add metrics and list of all metrics
@@ -721,221 +869,228 @@ function MetricsPage({ user, addMetric }) {
   );
 }
 
-// Schedule page: trainers create sessions; clients book sessions
-function SchedulePage({ user, sessions, createSession, bookSession }) {
-  const [title, setTitle] = useState('');
-  const [date, setDate] = useState('');
-  const [time, setTime] = useState('');
-  const [capacity, setCapacity] = useState('');
-  const [description, setDescription] = useState('');
+// Workouts page: track and complete workouts
+function WorkoutsPage({ user, programs, workouts, completeWorkout }) {
+  const [selectedProgram, setSelectedProgram] = useState('');
+  const [workoutInProgress, setWorkoutInProgress] = useState(null);
+  const [exerciseResults, setExerciseResults] = useState([]);
+  const [workoutNotes, setWorkoutNotes] = useState('');
   const [message, setMessage] = useState('');
 
-  const handleCreate = (e) => {
-    e.preventDefault();
-    if (!title || !date || !time || !capacity) return;
-    createSession(title, date, time, capacity, description);
-    setTitle('');
-    setDate('');
-    setTime('');
-    setCapacity('');
-    setDescription('');
-    setMessage('השיעור נוצר בהצלחה');
+  const userWorkouts = workouts.filter(w => w.userId === user.id);
+  const availablePrograms = user.role === 'trainer' ? programs : programs.filter(p => p.id === user.assignedProgramId);
+
+  const startWorkout = (programId) => {
+    const program = programs.find(p => p.id === programId);
+    if (!program) return;
+    
+    setWorkoutInProgress(program);
+    setExerciseResults(program.exercises.map(ex => ({
+      exerciseId: ex.id,
+      name: ex.name,
+      sets: ex.sets,
+      completedSets: [],
+      notes: ''
+    })));
+  };
+
+  const completeSet = (exerciseIndex, setIndex, reps, weight) => {
+    const newResults = [...exerciseResults];
+    if (!newResults[exerciseIndex].completedSets[setIndex]) {
+      newResults[exerciseIndex].completedSets[setIndex] = {};
+    }
+    newResults[exerciseIndex].completedSets[setIndex] = { reps: parseInt(reps), weight: parseFloat(weight) };
+    setExerciseResults(newResults);
+  };
+
+  const finishWorkout = () => {
+    completeWorkout(workoutInProgress.id, exerciseResults, workoutNotes);
+    setWorkoutInProgress(null);
+    setExerciseResults([]);
+    setWorkoutNotes('');
+    setMessage('האימון הושלם בהצלחה!');
   };
 
   return (
-    <div className="schedule-page">
-      <h2>שיעורים</h2>
-      {user.role === 'trainer' && (
-        <form onSubmit={handleCreate} className="session-form">
-          <h3>צור שיעור חדש</h3>
-          <label>
-            כותרת:
-            <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} required />
-          </label>
-          <label>
-            תאריך:
-            <input type="date" value={date} onChange={(e) => setDate(e.target.value)} required />
-          </label>
-          <label>
-            שעה:
-            <input type="time" value={time} onChange={(e) => setTime(e.target.value)} required />
-          </label>
-          <label>
-            קיבולת:
-            <input type="number" value={capacity} onChange={(e) => setCapacity(e.target.value)} required />
-          </label>
-          <label>
-            תיאור:
-            <textarea value={description} onChange={(e) => setDescription(e.target.value)} />
-          </label>
-          <button type="submit">שמור שיעור</button>
-          {message && <div className="message">{message}</div>}
-        </form>
-      )}
-      <h3>כל השיעורים</h3>
-      <ul className="sessions-list">
-        {sessions.map((s) => (
-          <li key={s.id} className="session-item">
-            <div>
-              <strong>{s.title}</strong> - {s.date} {s.time}
-              <br />
-              {s.description}
-              <br />
-              קיבולת: {s.participants.length}/{s.capacity}
-            </div>
-            {user.role === 'client' && (
-              <button
-                onClick={() => {
-                  bookSession(s.id);
-                }}
-                disabled={s.participants.includes(user.id) || s.participants.length >= s.capacity}
-              >
-                {s.participants.includes(user.id) ? 'נרשמת' : s.participants.length >= s.capacity ? 'מלא' : 'הירשם'}
-              </button>
+    <div className="workouts-page">
+      <h2>אימונים</h2>
+      
+      {!workoutInProgress ? (
+        <>
+          <div className="start-workout">
+            <h3>התחל אימון</h3>
+            <select 
+              value={selectedProgram} 
+              onChange={(e) => setSelectedProgram(e.target.value)}
+            >
+              <option value="">בחר תוכנית אימון</option>
+              {availablePrograms.map(p => (
+                <option key={p.id} value={p.id}>{p.name}</option>
+              ))}
+            </select>
+            <button 
+              onClick={() => startWorkout(selectedProgram)}
+              disabled={!selectedProgram}
+            >
+              התחל אימון
+            </button>
+          </div>
+          
+          <div className="workout-history">
+            <h3>היסטוריית אימונים</h3>
+            {userWorkouts.length === 0 ? (
+              <p>עדיין לא השלמת אימונים</p>
+            ) : (
+              <ul>
+                {userWorkouts.slice(-10).reverse().map(w => {
+                  const program = programs.find(p => p.id === w.programId);
+                  return (
+                    <li key={w.id}>
+                      <strong>{program?.name || 'תוכנית לא ידועה'}</strong>
+                      <br />
+                      תאריך: {new Date(w.date).toLocaleDateString('he-IL')}
+                      <br />
+                      תרגילים: {w.exercises.length}
+                      {w.notes && <><br />הערות: {w.notes}</>}
+                    </li>
+                  );
+                })}
+              </ul>
             )}
-          </li>
-        ))}
-      </ul>
+          </div>
+        </>
+      ) : (
+        <div className="workout-in-progress">
+          <h3>אימון בתהליך: {workoutInProgress.name}</h3>
+          
+          {workoutInProgress.exercises.map((exercise, exerciseIndex) => (
+            <div key={exercise.id} className="exercise-tracking">
+              <h4>{exercise.name}</h4>
+              <p>יעד: {exercise.sets} סטים × {exercise.reps} חזרות</p>
+              {exercise.weight > 0 && <p>משקל מומלץ: {exercise.weight} ק"ג</p>}
+              
+              <div className="sets-tracking">
+                {Array.from({ length: exercise.sets }, (_, setIndex) => (
+                  <div key={setIndex} className="set-input">
+                    <span>סט {setIndex + 1}:</span>
+                    <input 
+                      type="number" 
+                      placeholder="חזרות"
+                      onChange={(e) => completeSet(exerciseIndex, setIndex, e.target.value, 
+                        exerciseResults[exerciseIndex]?.completedSets[setIndex]?.weight || 0)}
+                    />
+                    <input 
+                      type="number" 
+                      placeholder="משקל (ק״ג)"
+                      onChange={(e) => completeSet(exerciseIndex, setIndex, 
+                        exerciseResults[exerciseIndex]?.completedSets[setIndex]?.reps || 0, e.target.value)}
+                    />
+                  </div>
+                ))}
+              </div>
+              
+              {exercise.notes && <p><em>הערות: {exercise.notes}</em></p>}
+            </div>
+          ))}
+          
+          <div className="workout-notes">
+            <label>
+              הערות לאימון:
+              <textarea 
+                value={workoutNotes}
+                onChange={(e) => setWorkoutNotes(e.target.value)}
+                placeholder="איך הרגשת? מה הלך טוב? מה אפשר לשפר?"
+              />
+            </label>
+          </div>
+          
+          <div className="workout-actions">
+            <button onClick={finishWorkout}>סיים אימון</button>
+            <button onClick={() => setWorkoutInProgress(null)}>בטל אימון</button>
+          </div>
+        </div>
+      )}
+      
+      {message && <div className="message">{message}</div>}
     </div>
   );
 }
 
-// Groups page: trainers create groups; clients join groups
-function GroupsPage({ user, groups, createGroup, joinGroup }) {
-  const [title, setTitle] = useState('');
-  const [date, setDate] = useState('');
-  const [time, setTime] = useState('');
-  const [capacity, setCapacity] = useState('');
-  const [description, setDescription] = useState('');
-  const [message, setMessage] = useState('');
-
-  const handleCreate = (e) => {
-    e.preventDefault();
-    if (!title || !date || !time || !capacity) return;
-    createGroup(title, date, time, capacity, description);
-    setTitle('');
-    setDate('');
-    setTime('');
-    setCapacity('');
-    setDescription('');
-    setMessage('הקבוצה נוצרה בהצלחה');
-  };
-
-  return (
-    <div className="groups-page">
-      <h2>קבוצות</h2>
-      {user.role === 'trainer' && (
-        <form onSubmit={handleCreate} className="group-form">
-          <h3>צור קבוצה חדשה</h3>
-          <label>
-            כותרת:
-            <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} required />
-          </label>
-          <label>
-            תאריך:
-            <input type="date" value={date} onChange={(e) => setDate(e.target.value)} required />
-          </label>
-          <label>
-            שעה:
-            <input type="time" value={time} onChange={(e) => setTime(e.target.value)} required />
-          </label>
-          <label>
-            קיבולת:
-            <input type="number" value={capacity} onChange={(e) => setCapacity(e.target.value)} required />
-          </label>
-          <label>
-            תיאור:
-            <textarea value={description} onChange={(e) => setDescription(e.target.value)} />
-          </label>
-          <button type="submit">שמור קבוצה</button>
-          {message && <div className="message">{message}</div>}
-        </form>
-      )}
-      <h3>כל הקבוצות</h3>
-      <ul className="groups-list">
-        {groups.map((g) => (
-          <li key={g.id} className="group-item">
-            <div>
-              <strong>{g.title}</strong> - {g.date} {g.time}
-              <br />
-              {g.description}
-              <br />
-              קיבולת: {g.members.length}/{g.capacity}
-            </div>
-            {user.role === 'client' && (
-              <button
-                onClick={() => joinGroup(g.id)}
-                disabled={g.members.includes(user.id) || g.members.length >= g.capacity}
-              >
-                {g.members.includes(user.id) ? 'הצטרפת' : g.members.length >= g.capacity ? 'מלא' : 'הצטרף'}
-              </button>
-            )}
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-// Store page: trainers create products; clients buy products
-function StorePage({ user, products, createProduct, purchaseProduct }) {
+// Exercises page: manage exercise library
+function ExercisesPage({ user, exercises, addExercise }) {
   const [name, setName] = useState('');
-  const [price, setPrice] = useState('');
-  const [description, setDescription] = useState('');
+  const [muscleGroup, setMuscleGroup] = useState('');
+  const [equipment, setEquipment] = useState('');
   const [message, setMessage] = useState('');
 
-  const handleCreate = (e) => {
+  const muscleGroups = ['חזה', 'גב', 'כתפיים', 'רגליים', 'בטן', 'זרועות', 'ישבן'];
+  const equipmentTypes = ['משקל גוף', 'משקולות', 'כבל', 'מכונה', 'אלסטיק', 'כדור רפואי'];
+
+  const handleAdd = (e) => {
     e.preventDefault();
-    if (!name || !price) return;
-    createProduct(name, price, description);
+    if (!name || !muscleGroup || !equipment) return;
+    addExercise(name, muscleGroup, equipment);
     setName('');
-    setPrice('');
-    setDescription('');
-    setMessage('המוצר נוצר בהצלחה');
+    setMuscleGroup('');
+    setEquipment('');
+    setMessage('התרגיל נוסף בהצלחה');
   };
 
   return (
-    <div className="store-page">
-      <h2>חנות</h2>
+    <div className="exercises-page">
+      <h2>ספריית תרגילים</h2>
+      
       {user.role === 'trainer' && (
-        <form onSubmit={handleCreate} className="product-form">
-          <h3>הוסף מוצר חדש</h3>
+        <form onSubmit={handleAdd} className="exercise-form">
+          <h3>הוסף תרגיל חדש</h3>
           <label>
-            שם מוצר:
+            שם התרגיל:
             <input type="text" value={name} onChange={(e) => setName(e.target.value)} required />
           </label>
           <label>
-            מחיר:
-            <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} required />
+            קבוצת שרירים:
+            <select value={muscleGroup} onChange={(e) => setMuscleGroup(e.target.value)} required>
+              <option value="">בחר קבוצת שרירים</option>
+              {muscleGroups.map(group => (
+                <option key={group} value={group}>{group}</option>
+              ))}
+            </select>
           </label>
           <label>
-            תיאור:
-            <textarea value={description} onChange={(e) => setDescription(e.target.value)} />
+            ציוד נדרש:
+            <select value={equipment} onChange={(e) => setEquipment(e.target.value)} required>
+              <option value="">בחר ציוד</option>
+              {equipmentTypes.map(eq => (
+                <option key={eq} value={eq}>{eq}</option>
+              ))}
+            </select>
           </label>
-          <button type="submit">שמור מוצר</button>
+          <button type="submit">הוסף תרגיל</button>
           {message && <div className="message">{message}</div>}
         </form>
       )}
-      <h3>כל המוצרים</h3>
-      <ul className="products-list">
-        {products.map((p) => (
-          <li key={p.id} className="product-item">
-            <div>
-              <strong>{p.name}</strong> - {p.price} ₪
-              <br />
-              {p.description}
+      
+      <div className="exercises-library">
+        <h3>כל התרגילים</h3>
+        <div className="exercises-grid">
+          {muscleGroups.map(group => (
+            <div key={group} className="muscle-group-section">
+              <h4>{group}</h4>
+              <ul>
+                {exercises
+                  .filter(ex => ex.muscleGroup === group)
+                  .map(ex => (
+                    <li key={ex.id}>
+                      <strong>{ex.name}</strong>
+                      <br />
+                      ציוד: {ex.equipment}
+                    </li>
+                  ))}
+              </ul>
             </div>
-            {user.role === 'client' && (
-              <button
-                onClick={() => purchaseProduct(p.id)}
-                disabled={user.purchasedProducts.includes(p.id)}
-              >
-                {user.purchasedProducts.includes(p.id) ? 'נרכש' : 'רכוש'}
-              </button>
-            )}
-          </li>
-        ))}
-      </ul>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

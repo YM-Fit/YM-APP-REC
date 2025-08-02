@@ -1,8 +1,7 @@
 /*
- * Global stylesheet for the React studio app.  We follow UI/UX best practices
- * by maintaining a clean, consistent layout with ample spacing and clear
- * typography.  The layout supports right-to-left reading and uses a
- * harmonious color palette to provide a pleasant user experience【60002966627165†L436-L449】.
+ * עיצוב אפליקציית מעקב אימונים - סטודיו YM
+ * האפליקציה תומכת בכיוון כתיבה מימין לשמאל ומשתמשת בפלטת צבעים הרמונית
+ * לחוויית משתמש נעימה ומקצועית.
  */
 
 body {
@@ -26,9 +25,11 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 .navbar-brand {
   font-weight: bold;
+  font-size: 1.1em;
 }
 .nav-links {
   list-style: none;
@@ -56,6 +57,8 @@ body {
 .page-container {
   flex: 1;
   padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 /* Auth page */
@@ -107,12 +110,23 @@ body {
 }
 
 /* Dashboard */
-.dashboard .metric-summary, .dashboard .program-summary {
+.dashboard .workout-summary,
+.dashboard .metric-summary, 
+.dashboard .program-summary {
   background-color: #fff;
   border: 1px solid #ddd;
   padding: 15px;
   border-radius: 6px;
   margin-bottom: 10px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+.dashboard .workout-summary h3,
+.dashboard .metric-summary h3,
+.dashboard .program-summary h3 {
+  margin-top: 0;
+  color: #2c3e50;
+  border-bottom: 2px solid #1abc9c;
+  padding-bottom: 5px;
 }
 .dashboard ul {
   list-style: none;
@@ -123,13 +137,46 @@ body {
 }
 
 /* Programs page */
-.programs-page form {
+.programs-page form,
+.program-editor {
   background-color: #fff;
   border: 1px solid #ddd;
   padding: 15px;
   border-radius: 6px;
   margin-bottom: 20px;
   max-width: 500px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+.program-editor {
+  max-width: 800px;
+  border: 2px solid #1abc9c;
+}
+.program-editor h3 {
+  color: #2c3e50;
+  border-bottom: 2px solid #1abc9c;
+  padding-bottom: 5px;
+}
+.exercise-editor {
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 4px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+.exercise-params {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+  margin: 10px 0;
+}
+.exercise-params label {
+  margin-bottom: 5px;
+}
+.exercise-params input {
+  width: 100%;
+  padding: 4px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
 }
 .programs-page label {
   display: block;
@@ -163,6 +210,20 @@ body {
   background-color: #fff;
   border: 1px solid #ddd;
   border-radius: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.programs-list li button {
+  background-color: #3498db;
+  color: #fff;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.programs-list li button:hover {
+  background-color: #2980b9;
 }
 
 /* Metrics page */
@@ -209,29 +270,119 @@ body {
   background-color: #ecf0f1;
 }
 
-/* Schedule, Groups and Store pages */
-.session-form, .group-form, .product-form {
+/* Workouts and Exercises pages */
+.workout-in-progress,
+.start-workout,
+.workout-history,
+.exercises-library,
+.exercise-form {
   background-color: #fff;
   border: 1px solid #ddd;
   padding: 15px;
   border-radius: 6px;
   margin-bottom: 20px;
-  max-width: 500px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
-.session-form label, .group-form label, .product-form label {
+.workout-in-progress {
+  max-width: 800px;
+}
+.exercise-tracking {
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 4px;
+  padding: 15px;
+  margin-bottom: 15px;
+}
+.exercise-tracking h4 {
+  margin-top: 0;
+  color: #2c3e50;
+}
+.sets-tracking {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 10px 0;
+}
+.set-input {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background-color: #fff;
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+}
+.set-input input {
+  width: 60px;
+  padding: 4px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+}
+.workout-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+.workout-actions button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+.workout-actions button:first-child {
+  background-color: #27ae60;
+  color: #fff;
+}
+.workout-actions button:first-child:hover {
+  background-color: #229954;
+}
+.workout-actions button:last-child {
+  background-color: #e74c3c;
+  color: #fff;
+}
+.workout-actions button:last-child:hover {
+  background-color: #c0392b;
+}
+.exercises-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 15px;
+}
+.muscle-group-section {
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 4px;
+  padding: 10px;
+}
+.muscle-group-section h4 {
+  margin-top: 0;
+  color: #2c3e50;
+  border-bottom: 1px solid #1abc9c;
+  padding-bottom: 5px;
+}
+.muscle-group-section ul {
+  list-style: none;
+  padding: 0;
+}
+.muscle-group-section li {
+  padding: 5px 0;
+  border-bottom: 1px solid #e9ecef;
+}
+.exercise-form label {
   display: block;
   margin-bottom: 8px;
 }
-.session-form input, .session-form textarea,
-.group-form input, .group-form textarea,
-.product-form input, .product-form textarea {
+.exercise-form input, 
+.exercise-form select, 
+.exercise-form textarea {
   width: 100%;
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: 4px;
   box-sizing: border-box;
 }
-.session-form button, .group-form button, .product-form button {
+.exercise-form button {
   background-color: #1abc9c;
   color: #fff;
   padding: 8px 12px;
@@ -239,14 +390,14 @@ body {
   border-radius: 4px;
   cursor: pointer;
 }
-.session-form button:hover, .group-form button:hover, .product-form button:hover {
+.exercise-form button:hover {
   background-color: #16a085;
 }
-.sessions-list, .groups-list, .products-list {
+.workout-history ul {
   list-style: none;
   padding: 0;
 }
-.session-item, .group-item, .product-item {
+.workout-history li {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -256,7 +407,7 @@ body {
   padding: 10px;
   margin-bottom: 6px;
 }
-.session-item button, .group-item button, .product-item button {
+.workout-history button {
   background-color: #3498db;
   color: #fff;
   padding: 6px 10px;
@@ -264,11 +415,11 @@ body {
   border-radius: 4px;
   cursor: pointer;
 }
-.session-item button:disabled, .group-item button:disabled, .product-item button:disabled {
+.workout-history button:disabled {
   background-color: #95a5a6;
   cursor: not-allowed;
 }
-.session-item button:hover:not(:disabled), .group-item button:hover:not(:disabled), .product-item button:hover:not(:disabled) {
+.workout-history button:hover:not(:disabled) {
   background-color: #2980b9;
 }
 
@@ -317,4 +468,28 @@ body {
   text-align: center;
   margin-top: 50px;
   font-size: 1.2em;
+  color: #2c3e50;
+}
+/* Responsive design */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .nav-links {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .exercise-params {
+    grid-template-columns: 1fr;
+  }
+  .sets-tracking {
+    flex-direction: column;
+  }
+  .exercises-grid {
+    grid-template-columns: 1fr;
+  }
+  .workout-actions {
+    flex-direction: column;
+  }
 }
